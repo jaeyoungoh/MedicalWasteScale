@@ -1,5 +1,6 @@
 package com.example.medical_waste_scale.common;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
@@ -10,13 +11,13 @@ import java.util.List;
 @Dao
 public interface DaoWeightInfo {
     @Query("SELECT * FROM weightInfo")
-    List<WeightInfo> getAll();
+    LiveData<List<WeightInfo>> getAll();
 
-    @Query("SELECT * FROM weightInfo where createDateTime >= (:startDateTime)")
-    List<WeightInfo> findByWeightInfos(String startDateTime);
+    @Query("SELECT SUM(weightValue) FROM weightInfo where createDateTime >= (:startDateTime)")
+    String totalWeightValues(String startDateTime);
 
-    @Query("SELECT * FROM weightInfo where createDateTime between (:startDateTime) and (:endDateTime)")
-    List<WeightInfo> findByWeightInfos(String startDateTime, String endDateTime);
+    @Query("SELECT SUM(weightValue) FROM weightInfo where createDateTime between (:startDateTime) and (:endDateTime)")
+    String totalWeightValues(String startDateTime, String endDateTime);
 
     @Insert
     void addWeightValue(WeightInfo weightInfo);
@@ -25,6 +26,6 @@ public interface DaoWeightInfo {
     void addWeightValue(int weightValue);
 
     @Update
-    void editWeightValue(WeightInfo weightInfo) ;
+    void editWeightValue(WeightInfo weightInfo);
 
 }

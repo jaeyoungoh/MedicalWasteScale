@@ -5,8 +5,5 @@
     <string name="left_contents_header">저울 무게</string>
     <string name="now_weight">0kg</string>
     <string name="right_contents_header">기간별 조회</string>
-    <string name="start_date_label">시 작 일</string>
-    <string name="end_date_label">종 료 일</string>
     <string name="total_weight_label">합계</string>
-    <string name="total_weight">0kg</string>
 </resources>

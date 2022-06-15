@@ -12,14 +12,14 @@ import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.util.Log;
 
-import usbserial.BuildConfig;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import usbserial.BuildConfig;
 
 public class Ch34xSerialDriver implements UsbSerialDriver {
 

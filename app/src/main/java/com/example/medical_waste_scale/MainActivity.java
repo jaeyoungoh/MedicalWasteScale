@@ -71,5 +71,6 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         View receiveBtn = findViewById(R.id.receive_btn);
+
     }
 }

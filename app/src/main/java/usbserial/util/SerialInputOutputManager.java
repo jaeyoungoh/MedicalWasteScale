@@ -9,10 +9,10 @@ package usbserial.util;
 import android.os.Process;
 import android.util.Log;
 
-import usbserial.driver.UsbSerialPort;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
+import usbserial.driver.UsbSerialPort;
 
 /**
  * Utility class which services a {@link UsbSerialPort} in its {@link #run()} method.

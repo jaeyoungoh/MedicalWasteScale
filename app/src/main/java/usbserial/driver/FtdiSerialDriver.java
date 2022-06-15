@@ -12,14 +12,14 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.util.Log;
 
-import usbserial.util.MonotonicClock;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import usbserial.util.MonotonicClock;
 
 /*
  * driver is implemented from various information scattered over FTDI documentation

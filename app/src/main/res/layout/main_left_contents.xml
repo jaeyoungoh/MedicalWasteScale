@@ -38,7 +38,6 @@
         android:layout_height="0dp"
         android:layout_marginStart="40dp"
         android:text="@string/now_weight_number"
-        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/now_weight_unit"
         app:layout_constraintHorizontal_weight="0.3"

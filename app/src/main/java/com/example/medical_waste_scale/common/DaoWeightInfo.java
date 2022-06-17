@@ -6,6 +6,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import java.util.Date;
 import java.util.List;
 
 @Dao
@@ -14,10 +15,10 @@ public interface DaoWeightInfo {
     LiveData<List<WeightInfo>> getAll();
 
     @Query("SELECT SUM(weightValue) FROM weightInfo where createDateTime >= (:startDateTime)")
-    String totalWeightValues(String startDateTime);
+    String totalWeightValues(Date startDateTime);
 
     @Query("SELECT SUM(weightValue) FROM weightInfo where createDateTime between (:startDateTime) and (:endDateTime)")
-    String totalWeightValues(String startDateTime, String endDateTime);
+    String totalWeightValues(Date startDateTime, Date endDateTime);
 
     @Insert
     void addWeightValue(WeightInfo weightInfo);

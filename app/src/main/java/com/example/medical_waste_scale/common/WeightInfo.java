@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import java.util.Date;
 
 @Entity
 public class WeightInfo {
@@ -11,7 +14,8 @@ public class WeightInfo {
     private int uid;
 
     @ColumnInfo(name = "createDateTime", defaultValue = "CURRENT_TIMESTAMP")
-    private String createDateTime;
+    @TypeConverters({RoomTypeConverter.class})
+    private Date createDateTime;
 
     @ColumnInfo(name = "medicalWasteType", defaultValue = "none")
     private String medicalWasteType;
@@ -20,20 +24,19 @@ public class WeightInfo {
     @NonNull
     private int weightValue;
 
+    public Date getCreateDateTime() {
+        return createDateTime;
+    }
+
+    public void setCreateDateTime(Date createDateTime) {
+        this.createDateTime = createDateTime;
+    }
     public int getUid() {
         return uid;
     }
 
     public void setUid(int uid) {
         this.uid = uid;
-    }
-
-    public String getCreateDateTime() {
-        return createDateTime;
-    }
-
-    public void setCreateDateTime(String createDateTime) {
-        this.createDateTime = createDateTime;
     }
 
     public String getMedicalWasteType() {

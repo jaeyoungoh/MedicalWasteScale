@@ -17,6 +17,7 @@
             style="@style/Font_LeftContentsHeader"/>
     </LinearLayout>
     <TextView
+        android:id="@+id/weight_number"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/now_weight"

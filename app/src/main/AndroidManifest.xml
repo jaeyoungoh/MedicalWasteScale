@@ -15,7 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Medical_waste_Scale"
-        tools:targetApi="31">
+        tools:targetApi="s">
 
         <activity
             android:name=".MainActivity"

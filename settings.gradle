@@ -1,5 +1,6 @@
 pluginManagement {
     repositories {
+        jcenter()
         gradlePluginPortal()
         google()
         mavenCentral()
@@ -15,3 +16,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Medical_waste_Scale"
 include ':app'
+include ':usbserial'

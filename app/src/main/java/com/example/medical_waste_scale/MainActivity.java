@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.medical_waste_scale.databinding.MainBinding;
+import com.example.medical_waste_scale.databinding.MainLeftContentsBinding;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
 
@@ -35,16 +37,28 @@ public class MainActivity extends AppCompatActivity {
     private Handler mainLooper;
     private BroadcastReceiver broadcastReceiver;
 
+    private MainBinding viewBinding;
+    private MainLeftContentsBinding leftContentsBinding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
         //네비게이션 바(소프트키) 숨김
-        View decorView = getWindow().getDecorView();
+        final View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         //화면을 켜진 상태로 유지
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        leftContentsBinding = MainLeftContentsBinding.inflate(getLayoutInflater());
+
+        updateWeightNumber(leftContentsBinding, "3kg");
+
+    }
+
+    private void updateWeightNumber(MainLeftContentsBinding viewBinding, String num)
+    {
+        viewBinding.weightNum.setText(num);
     }
 }

@@ -59,6 +59,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateWeightNumber(MainLeftContentsBinding viewBinding, String num)
     {
-        viewBinding.weightNum.setText(num);
+        viewBinding.nowWeightNumber.setText(num);
     }
 }

@@ -17,6 +17,7 @@
             style="@style/Font_LeftContentsHeader"/>
     </LinearLayout>
     <TextView
+        android:id="@+id/weightNum"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/now_weight"
@@ -26,5 +27,4 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_bias="0.2"
         style="@style/Font_LeftContentsHeader"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

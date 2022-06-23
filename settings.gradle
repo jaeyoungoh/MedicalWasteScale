@@ -14,6 +14,6 @@ dependencyResolutionManagement {
         maven { url "https://jitpack.io" }
     }
 }
-rootProject.name = "Medical_waste_Scale"
+rootProject.name = "medicalWasteScale"
 include ':app'
 include ':usbserial'

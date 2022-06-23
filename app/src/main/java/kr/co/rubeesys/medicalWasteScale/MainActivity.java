@@ -1,4 +1,4 @@
-package com.example.medical_waste_scale;
+package kr.co.rubeesys.medicalWasteScale;
 
 import android.content.BroadcastReceiver;
 import android.os.Bundle;
@@ -10,10 +10,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.medical_waste_scale.databinding.MainBinding;
-import com.example.medical_waste_scale.databinding.MainLeftContentsBinding;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
+
+import kr.co.rubeesys.medicalWasteScale.databinding.MainBinding;
+import kr.co.rubeesys.medicalWasteScale.databinding.MainLeftContentsBinding;
 
 public class MainActivity extends AppCompatActivity {
 

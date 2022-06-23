@@ -57,14 +57,12 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mHandler = new MyHandler(this);
-
-        leftContentsBinding = MainLeftContentsBinding.inflate(getLayoutInflater());
-        mainActivityBinding.imageLogo.setOnClickListener(v -> sendingSerialTestData());
+//        mainActivityBinding.imageLogo.setOnClickListener(v -> sendingSerialTestData());
 
     }
 
     private void sendingSerialTestData(){
-        final String data = "5.3";
+        final String data = "             5.33 kg            ";
         if(usbService != null)
             usbService.write(data.getBytes());
     }
@@ -149,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case UsbService.MESSAGE_FROM_SERIAL_PORT:
-                    String data = (String) msg.obj;
+                    String data = convertWeightValue(msg);
                     mActivity.get().mainActivityBinding.leftContents.nowWeightNumber.setText(data); //시리얼 데이터 연동
                     break;
                 case UsbService.CTS_CHANGE:
@@ -159,6 +157,19 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(mActivity.get(), "DSR 변화 감지됨",Toast.LENGTH_LONG).show();
                     break;
             }
+        }
+
+        private String convertWeightValue (Message msg)
+        {
+            float result = 0.0f;
+            final String data[] = ((String) msg.obj).trim().split(" ");
+            if(data == null)
+                return "0.0";
+            else
+            {
+                result = Float.parseFloat(data[0]);
+            }
+            return String.format("%.1f",result);
         }
     }
 }

@@ -7,9 +7,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -17,7 +19,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 
 import kr.co.rubeesys.medicalWasteScale.databinding.MainBinding;
@@ -59,12 +66,45 @@ public class MainActivity extends AppCompatActivity {
         mHandler = new MyHandler(this);
 //        mainActivityBinding.imageLogo.setOnClickListener(v -> sendingSerialTestData());
 
-    }
+        // csv 파일 저장
+        mainActivityBinding.btnSaveSvc.setOnClickListener(v -> saveCsvFile());
 
+    }
     private void sendingSerialTestData(){
         final String data = "             5.33 kg            ";
         if(usbService != null)
             usbService.write(data.getBytes());
+    }
+
+    private void saveCsvFile(){
+        File appDir = new File(mainActivityBinding.getRoot().getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),   "Medical_Waste_Scale_data");
+        appDir.mkdirs();
+        try {
+            String storageState = Environment.getExternalStorageState();
+            if (storageState.equals(Environment.MEDIA_MOUNTED)) {
+                File file = new File(mainActivityBinding.getRoot().getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/Medical_Waste_Scale_data/" + nowDate() + "_OutputFile.csv");
+                FileOutputStream fos = new FileOutputStream(file);
+                String text = nowDateTime() + "," + "5.1";
+                fos.write(text.getBytes());
+                fos.close();
+            }
+        }   catch (IOException e) {
+            Log.e("IOException", "exception in saveCsvFile() method");
+        }
+    }
+
+    private String nowDate(){
+        long now = System.currentTimeMillis();
+        Date date = new Date(now);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(date);
+    }
+
+    private String nowDateTime(){
+        long now = System.currentTimeMillis();
+        Date date = new Date(now);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(date);
     }
 
     @Override

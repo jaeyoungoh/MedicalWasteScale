@@ -204,12 +204,12 @@ public class MainActivity extends AppCompatActivity {
             float result = 0.0f;
             final String data[] = ((String) msg.obj).trim().split(" ");
             if(data == null)
-                return "0.0";
+                return "0.00";
             else
             {
                 result = Float.parseFloat(data[0]);
             }
-            return String.format("%.1f",result);
+            return String.format("%.2f",result);
         }
     }
 }

@@ -1,48 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Font_HeaderTitle">
-        <item name="android:fontFamily">@font/noto_sans</item>
+        <item name="android:fontFamily">@font/h2hdrm</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">30dp</item>
+        <item name="android:textSize">40sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:shadowColor">@color/black</item>
-        <item name="android:shadowRadius">20</item>
+        <item name="android:shadowRadius">10</item>
         <item name="android:shadowDx">5</item>
         <item name="android:shadowDy">5</item>
     </style>
     <style name="Font_BottomContactNumber">
-        <item name="android:fontFamily">@font/noto_sans</item>
+        <item name="android:fontFamily">@font/h2hdrm</item>
         <item name="android:textColor">@color/white</item>
         <item name="autoSizeTextType">uniform</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:autoSizeMaxTextSize">300dp</item>
-        <item name="android:autoSizeMinTextSize">200dp</item>
+        <item name="android:autoSizeMaxTextSize">300sp</item>
+        <item name="android:autoSizeStepGranularity">10sp</item>
+        <item name="android:autoSizeMinTextSize">200sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:gravity">center</item>
         <item name="android:letterSpacing">0.1</item>
     </style>
 
-    <style name="Font_LeftContentsHeader">
-        <item name="android:fontFamily">@font/noto_sans</item>
+    <style name="Font_NowWeightHeader">
+        <item name="android:fontFamily">@font/h2hdrm</item>
         <item name="android:textColor">@color/white</item>
-        <item name="autoSizeTextType">uniform</item>
+        <item name="android:textSize">60sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:autoSizeMaxTextSize">300dp</item>
-        <item name="android:autoSizeMinTextSize">200dp</item>
+        <item name="android:autoSizeMaxTextSize">300sp</item>
+        <item name="android:autoSizeStepGranularity">10sp</item>
+        <item name="android:autoSizeMinTextSize">200sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:gravity">center</item>
         <item name="android:letterSpacing">0.1</item>
     </style>
 
-    <style name="Font_RightContentsHeader">
-        <item name="android:fontFamily">@font/noto_sans</item>
+    <style name="Font_NowWeightNumber">
+        <item name="android:fontFamily">@font/h2hdrm</item>
         <item name="android:textColor">@color/white</item>
-        <item name="autoSizeTextType">uniform</item>
+        <item name="android:autoSizeTextType">uniform</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:autoSizeMaxTextSize">300dp</item>
-        <item name="android:autoSizeMinTextSize">200dp</item>
+        <item name="android:textSize">50sp</item>
+        <item name="android:autoSizeMaxTextSize">120sp</item>
+        <item name="android:autoSizeStepGranularity">5sp</item>
+        <item name="android:autoSizeMinTextSize">40sp</item>
         <item name="android:maxLines">1</item>
         <item name="android:gravity">center</item>
         <item name="android:letterSpacing">0.1</item>
     </style>
+
+    <style name="Font_NowWeightUnit">
+        <item name="android:fontFamily">@font/h2hdrm</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:autoSizeMaxTextSize">60sp</item>
+        <item name="android:autoSizeStepGranularity">10sp</item>
+        <item name="android:autoSizeMinTextSize">30sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:letterSpacing">0.1</item>
+    </style>
+
+    <style name="Font_TotalWeightHeader">
+        <item name="android:fontFamily">@font/h2hdrm</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">60sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:autoSizeMaxTextSize">300sp</item>
+        <item name="android:autoSizeStepGranularity">10sp</item>
+        <item name="android:autoSizeMinTextSize">200sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:letterSpacing">1</item>
+    </style>
+
+    <style name="Font_BeginDateLabel">
+        <item name="android:fontFamily">@font/h2hdrm</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:autoSizeMaxTextSize">30sp</item>
+        <item name="android:autoSizeStepGranularity">10sp</item>
+        <item name="android:autoSizeMinTextSize">10sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:letterSpacing">0.1</item>
+    </style>
+
+    <style name="Font_EndDateLabel">
+        <item name="android:fontFamily">@font/h2hdrm</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:autoSizeMaxTextSize">30sp</item>
+        <item name="android:autoSizeStepGranularity">10sp</item>
+        <item name="android:autoSizeMinTextSize">10sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:letterSpacing">0.1</item>
+    </style>
+
+    <style name="Font_TotalWeightLabel">
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:fontFamily">@font/h2hdrm</item>
+        <item name="android:textColor">#002060</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">45sp</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:autoSizeMinTextSize">30sp</item>
+        <item name="android:autoSizeStepGranularity">1sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:letterSpacing">0.1</item>
+    </style>
+
+    <style name="Font_TotalWeightNumber">
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:fontFamily">@font/h2hdrm</item>
+        <item name="android:textColor">#002060</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">55sp</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:autoSizeMinTextSize">40sp</item>
+        <item name="android:autoSizeMaxTextSize">70sp</item>
+        <item name="android:autoSizeStepGranularity">2sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:letterSpacing">0.1</item>
+    </style>
+
+    <style name="Font_TotalWeightUnit">
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:fontFamily">@font/h2hdrm</item>
+        <item name="android:textColor">#002060</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:autoSizeMinTextSize">10sp</item>
+        <item name="android:autoSizeStepGranularity">2sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:letterSpacing">0.1</item>
+    </style>
+
 </resources>

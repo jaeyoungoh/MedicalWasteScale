@@ -14,7 +14,7 @@ public class WeightInfo {
     private int uid;
 
     @ColumnInfo(name = "createDateTime", defaultValue = "CURRENT_TIMESTAMP")
-    @TypeConverters({RoomTypeConverter.class})
+    @TypeConverters({DateTimeTypeConverter.class})
     private Date createDateTime;
 
     @ColumnInfo(name = "medicalWasteType", defaultValue = "none")

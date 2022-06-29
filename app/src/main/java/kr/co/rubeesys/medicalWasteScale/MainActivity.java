@@ -8,9 +8,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -18,34 +16,35 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
-import kr.co.rubeesys.medicalWasteScale.common.AppDatabase;
-import kr.co.rubeesys.medicalWasteScale.common.RoomTypeConverter;
 import kr.co.rubeesys.medicalWasteScale.databinding.MainBinding;
 import kr.co.rubeesys.medicalWasteScale.databinding.MainLeftContentsBinding;
 
 public class MainActivity extends AppCompatActivity {
 
-    private MainBinding mainActivityBinding;
+    //Timer
+    
+
+    // main binding
+    public MainBinding mainActivityBinding;
     private MainLeftContentsBinding leftContentsBinding;
 
+    // USB Service
     private UsbService usbService;
     private TextView nowWeightNumber;
-    private MyHandler mHandler;
+    private UsbServiceHandler mUsbServiceHandler;
     private final ServiceConnection usbConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName arg0, IBinder arg1) {
             usbService = ((UsbService.UsbBinder) arg1).getService();
-            usbService.setHandler(mHandler);
+            usbService.setHandler(mUsbServiceHandler);
         }
 
         @Override
@@ -53,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
             usbService = null;
         }
     };
+
+    //DB 생성
+//    static final AppDatabase localDB = Room.databaseBuilder(new Application(), AppDatabase.class, "WeightInfo")
+////                .addTypeConverter(new DateTimeTypeConverter())
+//            .allowMainThreadQueries()
+//            .build();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,29 +71,19 @@ public class MainActivity extends AppCompatActivity {
         //화면을 켜진 상태로 유지
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        mHandler = new MyHandler(this);
-//        mainActivityBinding.imageLogo.setOnClickListener(v -> sendingSerialTestData());
-
-        //DB 생성
-        final AppDatabase localDB = Room.databaseBuilder(this, AppDatabase.class, "WeightInfo")
-                .addTypeConverter(new RoomTypeConverter())
-                .allowMainThreadQueries()
-                .build();
+        mUsbServiceHandler = new UsbServiceHandler(this, mainActivityBinding );
+        mainActivityBinding.imageLogo.setOnClickListener(v -> sendingSerialTestData(v));
 
         //DB 변경 발생시
-        localDB.DaoWeightInfo().getAll().observe(this, getData -> {
-            Log.i("Medical Waste Scale Test", getData.toString());
-        });
-
-//                WeightInfo weightInfo = new WeightInfo();
-//                weightInfo.setWeightValue(30);
-//                localDB.DaoWeightInfo().addWeightValue(weightInfo);
+//        localDB.DaoWeightInfo().getAll().observe(this, getData -> {
+//            Log.i("Medical Waste Scale Test", getData.toString());
+//        });
 
         // csv 파일 저장
         mainActivityBinding.btnSaveSvc.setOnClickListener(v -> saveCsvFile());
 
     }
-    private void sendingSerialTestData(){
+    private void sendingSerialTestData(View v){
         final String data = "             5.33 kg            ";
         if(usbService != null)
             usbService.write(data.getBytes());
@@ -153,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
         }
         Intent bindingIntent = new Intent(this, service);
         bindService(bindingIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+        mUsbReceiver.onReceive(mainActivityBinding.getRoot().getContext(), bindingIntent);
     }
 
     /*
@@ -191,43 +187,4 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(mUsbReceiver, filter);
     }
 
-    /*
-     * This handler will be passed to UsbService. Data received from serial port is displayed through this handler
-     */
-    private static class MyHandler extends Handler {
-        private final WeakReference<MainActivity> mActivity;
-
-        public MyHandler(MainActivity activity) {
-            mActivity = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case UsbService.MESSAGE_FROM_SERIAL_PORT:
-                    String data = convertWeightValue(msg);
-                    mActivity.get().mainActivityBinding.leftContents.nowWeightNumber.setText(data); //시리얼 데이터 연동
-                    break;
-                case UsbService.CTS_CHANGE:
-                    Toast.makeText(mActivity.get(), "CTS 변화 감지됨",Toast.LENGTH_LONG).show();
-                    break;
-                case UsbService.DSR_CHANGE:
-                    Toast.makeText(mActivity.get(), "DSR 변화 감지됨",Toast.LENGTH_LONG).show();
-                    break;
-            }
-        }
-
-        private String convertWeightValue (Message msg)
-        {
-            float result = 0.0f;
-            final String data[] = ((String) msg.obj).trim().split(" ");
-            if(data == null)
-                return "0.00";
-            else
-            {
-                result = Float.parseFloat(data[0]);
-            }
-            return String.format("%.2f",result);
-        }
-    }
 }

@@ -6,7 +6,7 @@ import androidx.room.TypeConverter;
 import java.util.Date;
 
 @ProvidedTypeConverter
-public class RoomTypeConverter {
+public class DateTimeTypeConverter {
     @TypeConverter
     public static Date fromTimestamp(Long value) {
         return value == null ? null : new Date(value);

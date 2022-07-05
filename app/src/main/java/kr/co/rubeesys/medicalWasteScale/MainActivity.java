@@ -21,6 +21,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoField;
 import java.util.Date;
 import java.util.Set;
 
@@ -28,9 +33,6 @@ import kr.co.rubeesys.medicalWasteScale.databinding.MainBinding;
 import kr.co.rubeesys.medicalWasteScale.databinding.MainLeftContentsBinding;
 
 public class MainActivity extends AppCompatActivity {
-
-    //Timer
-    
 
     // main binding
     public MainBinding mainActivityBinding;
@@ -87,6 +89,26 @@ public class MainActivity extends AppCompatActivity {
         final String data = "             5.33 kg            ";
         if(usbService != null)
             usbService.write(data.getBytes());
+
+    }
+
+    private long converTingToZeroTime(long now){
+
+        long convertedDate = 0;
+
+        if(now == 0) return 0;
+
+        LocalTime midnight = LocalTime.MIDNIGHT;
+        LocalDate today = LocalDate.now(ZoneId.systemDefault());
+        LocalDateTime todayMidnight = LocalDateTime.of(today, midnight);
+        LocalDateTime tomorrowMidnight = todayMidnight.plusDays(1);
+
+        Date nowDate = new Date(now);
+        LocalDate convertingDate = nowDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDateTime daytoMidnight = LocalDateTime.of(convertingDate, LocalTime.MIDNIGHT);
+        convertedDate = daytoMidnight.getLong(ChronoField.CLOCK_HOUR_OF_DAY);
+
+        return convertedDate;
     }
 
     private void saveCsvFile(){
@@ -148,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
         }
         Intent bindingIntent = new Intent(this, service);
         bindService(bindingIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-        mUsbReceiver.onReceive(mainActivityBinding.getRoot().getContext(), bindingIntent);
     }
 
     /*

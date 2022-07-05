@@ -39,6 +39,7 @@ public class UsbService extends Service {
     public static final int MESSAGE_FROM_SERIAL_PORT = 0;
     public static final int CTS_CHANGE = 1;
     public static final int DSR_CHANGE = 2;
+    public static final int INIT_VALUE = 3;
     private static final String ACTION_USB_PERMISSION = "kr.co.rubeesys.medicalWasteScale.USB_PERMISSION";
     private static final int BAUD_RATE = 9600; // BaudRate. Change this value if you need
     public static boolean SERVICE_CONNECTED = false;

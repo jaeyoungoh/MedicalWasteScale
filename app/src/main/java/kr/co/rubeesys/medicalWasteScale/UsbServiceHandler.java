@@ -29,21 +29,24 @@ public class UsbServiceHandler extends Handler{
                 case UsbService.MESSAGE_FROM_SERIAL_PORT:
                     String data = convertWeightValue(msg);
                     mActivity.get().mainActivityBinding.leftContents.nowWeightNumber.setText(data); //시리얼 데이터 연동 Display
+
+                    //Db Insert
                     WeightInfo weightInfo = new WeightInfo();
                     weightInfo.setWeightValue(30);
                     long now = System.currentTimeMillis();
                     Date nowDtm = new Date(now);
                     weightInfo.setCreateDateTime(nowDtm);
-
-                    //Db Insert
 //                    MainActivity.localDB.;
-
+                    this.sendEmptyMessageDelayed(UsbService.INIT_VALUE, 5000);
                     break;
                 case UsbService.CTS_CHANGE:
                     Toast.makeText(mActivity.get(), "CTS 변화 감지됨",Toast.LENGTH_LONG).show();
                     break;
                 case UsbService.DSR_CHANGE:
                     Toast.makeText(mActivity.get(), "DSR 변화 감지됨",Toast.LENGTH_LONG).show();
+                    break;
+                case UsbService.INIT_VALUE:
+                    mActivity.get().mainActivityBinding.leftContents.nowWeightNumber.setText("0.00"); //시리얼 데이터 초기화
                     break;
             }
         }

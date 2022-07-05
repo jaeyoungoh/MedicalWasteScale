@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import androidx.room.TypeConverters;
 
 import java.util.Date;
 
@@ -14,7 +13,6 @@ public class WeightInfo {
     private int uid;
 
     @ColumnInfo(name = "createDateTime", defaultValue = "CURRENT_TIMESTAMP")
-    @TypeConverters({DateTimeTypeConverter.class})
     private Date createDateTime;
 
     @ColumnInfo(name = "medicalWasteType", defaultValue = "none")

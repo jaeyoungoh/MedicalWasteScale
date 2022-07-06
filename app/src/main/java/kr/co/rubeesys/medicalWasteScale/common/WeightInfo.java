@@ -5,28 +5,26 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import java.util.Date;
-
 @Entity
 public class WeightInfo {
     @PrimaryKey(autoGenerate = true)
     private int uid;
 
     @ColumnInfo(name = "createDateTime", defaultValue = "CURRENT_TIMESTAMP")
-    private Date createDateTime;
+    private long createDateTime;
 
     @ColumnInfo(name = "medicalWasteType", defaultValue = "none")
     private String medicalWasteType;
 
     @ColumnInfo(name = "weightValue", defaultValue = "0")
     @NonNull
-    private int weightValue;
+    private double weightValue;
 
-    public Date getCreateDateTime() {
+    public long getCreateDateTime() {
         return createDateTime;
     }
 
-    public void setCreateDateTime(Date createDateTime) {
+    public void setCreateDateTime(long createDateTime) {
         this.createDateTime = createDateTime;
     }
     public int getUid() {
@@ -45,11 +43,11 @@ public class WeightInfo {
         this.medicalWasteType = medicalWasteType;
     }
 
-    public int getWeightValue() {
+    public double getWeightValue() {
         return weightValue;
     }
 
-    public void setWeightValue(int weightValue) {
+    public void setWeightValue(double weightValue) {
         this.weightValue = weightValue;
     }
 

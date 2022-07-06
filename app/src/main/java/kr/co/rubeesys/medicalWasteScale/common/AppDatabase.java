@@ -8,10 +8,10 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 @TypeConverters({DateTimeTypeConverter.class})
-@Database(entities = {WeightInfo.class}, version = 1)
+@Database(entities = {WeightInfo.class}, version = 4)
 public abstract class AppDatabase extends RoomDatabase {
 
-    private static final String DBName = "WeightInf";
+    private static final String DBName = "WeightInfoDB";
     private static AppDatabase appDatabase;
     public abstract DaoWeightInfo DaoWeightInfo();
 

@@ -29,10 +29,15 @@ import java.time.temporal.ChronoField;
 import java.util.Date;
 import java.util.Set;
 
+import kr.co.rubeesys.medicalWasteScale.common.AppDatabase;
+import kr.co.rubeesys.medicalWasteScale.common.AsyncSelectDB;
 import kr.co.rubeesys.medicalWasteScale.databinding.MainBinding;
 import kr.co.rubeesys.medicalWasteScale.databinding.MainLeftContentsBinding;
 
 public class MainActivity extends AppCompatActivity {
+
+    //Local DB
+    public static AppDatabase localDB;
 
     // main binding
     public MainBinding mainActivityBinding;
@@ -55,12 +60,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    //DB 생성
-//    static final AppDatabase localDB = Room.databaseBuilder(new Application(), AppDatabase.class, "WeightInfo")
-////                .addTypeConverter(new DateTimeTypeConverter())
-//            .allowMainThreadQueries()
-//            .build();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,13 +72,34 @@ public class MainActivity extends AppCompatActivity {
         //화면을 켜진 상태로 유지
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        mUsbServiceHandler = new UsbServiceHandler(this, mainActivityBinding );
+        mUsbServiceHandler = new UsbServiceHandler(this);
         mainActivityBinding.imageLogo.setOnClickListener(v -> sendingSerialTestData(v));
 
+        //DB 생성
+        localDB = AppDatabase.getInstance(this.getApplicationContext());
+
         //DB 변경 발생시
-//        localDB.DaoWeightInfo().getAll().observe(this, getData -> {
-//            Log.i("Medical Waste Scale Test", getData.toString());
-//        });
+        localDB.DaoWeightInfo().getAll().observe(this, getData -> {
+            Log.i("Medical Waste Scale Test", getData.toString());
+            if(getData.isEmpty() || getData.size() <= 0)
+                return;
+            long selectDateTime = converTingToZeroTime(System.currentTimeMillis());
+
+            new AsyncSelectDB(localDB.DaoWeightInfo(), new AsyncSelectDB.AsyncTaskCallback(){
+                @Override
+                public void onSuccess(String result) {
+                    mainActivityBinding.rightContents.totalWeightNumber.setText(result);
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(getApplicationContext(), "Error : DB", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            }).execute(Long.valueOf(selectDateTime));
+
+
+        });
 
         // csv 파일 저장
         mainActivityBinding.btnSaveSvc.setOnClickListener(v -> saveCsvFile());
@@ -92,19 +112,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private long converTingToZeroTime(long now){
+    private long converTingToZeroTime(long dtm){
 
         long convertedDate = 0;
 
-        if(now == 0) return 0;
+        if(dtm == 0) return 0;
 
-        LocalTime midnight = LocalTime.MIDNIGHT;
-        LocalDate today = LocalDate.now(ZoneId.systemDefault());
-        LocalDateTime todayMidnight = LocalDateTime.of(today, midnight);
-        LocalDateTime tomorrowMidnight = todayMidnight.plusDays(1);
-
-        Date nowDate = new Date(now);
-        LocalDate convertingDate = nowDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        Date mDtm = new Date(dtm);
+        LocalDate convertingDate = mDtm.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDateTime daytoMidnight = LocalDateTime.of(convertingDate, LocalTime.MIDNIGHT);
         convertedDate = daytoMidnight.getLong(ChronoField.CLOCK_HOUR_OF_DAY);
 

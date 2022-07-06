@@ -14,11 +14,11 @@ public interface DaoWeightInfo {
     @Query("SELECT * FROM weightInfo")
     LiveData<List<WeightInfo>> getAll();
 
-    @Query("SELECT SUM(weightValue) FROM weightInfo where createDateTime >= (:startDateTime)")
-    String totalWeightValues(long startDateTime);
+    @Query("SELECT COALESCE(SUM(COALESCE(weightValue,0)),0) as totalWeight FROM weightInfo where createDateTime >= (:startDateTime)")
+    Double totalWeightValues(long startDateTime);
 
-    @Query("SELECT SUM(weightValue) FROM weightInfo where createDateTime between (:startDateTime) and (:endDateTime)")
-    String totalWeightValues(long startDateTime, long endDateTime);
+    @Query("SELECT COALESCE(SUM(COALESCE(weightValue,0)),0) as totalWeight FROM weightInfo where createDateTime between (:startDateTime) and (:endDateTime)")
+    Double totalWeightValues(long startDateTime, long endDateTime);
 
     @Insert
     void addWeightValue(WeightInfo weightInfo);

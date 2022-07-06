@@ -5,10 +5,9 @@ import android.os.Message;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
-import java.util.Date;
 
+import kr.co.rubeesys.medicalWasteScale.common.AsyncInsertDB;
 import kr.co.rubeesys.medicalWasteScale.common.WeightInfo;
-import kr.co.rubeesys.medicalWasteScale.databinding.MainBinding;
 
 public class UsbServiceHandler extends Handler{
 
@@ -16,11 +15,9 @@ public class UsbServiceHandler extends Handler{
      * This handler will be passed to UsbService. Data received from serial port is displayed through this handler
      */
         private static WeakReference<MainActivity> mActivity;
-        private MainBinding mActivityBinding;
 
-        public UsbServiceHandler(MainActivity activity, MainBinding mainActivityBinding) {
+        public UsbServiceHandler(MainActivity activity) {
             mActivity = new WeakReference<>(activity);
-            mActivityBinding = mainActivityBinding;
         }
 
         @Override
@@ -33,11 +30,12 @@ public class UsbServiceHandler extends Handler{
 
                     //Db Insert
                     WeightInfo weightInfo = new WeightInfo();
-                    weightInfo.setWeightValue(30);
-                    long now = System.currentTimeMillis();
-                    Date nowDtm = new Date(now);
-                    weightInfo.setCreateDateTime(nowDtm);
-//                    MainActivity.localDB.;
+                    weightInfo.setWeightValue(Double.parseDouble(data));
+                    weightInfo.setCreateDateTime(System.currentTimeMillis());
+
+                    new AsyncInsertDB(MainActivity.localDB.DaoWeightInfo()).execute(weightInfo);
+                    //Log.d("Inter to DB",MainActivity.localDB.DaoWeightInfo().getAll().toString());
+
                     //시리얼 데이터 초기화
                     this.removeMessages(UsbService.INIT_VALUE);
                     this.sendEmptyMessageDelayed(UsbService.INIT_VALUE, 5000);

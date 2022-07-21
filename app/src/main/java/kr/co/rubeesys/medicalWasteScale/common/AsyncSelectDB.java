@@ -20,14 +20,13 @@ public class AsyncSelectDB extends AsyncTask<Long, Void, Void> {
     protected Void doInBackground(Long... startDateTime) {
         try
         {
-            totalWeight = String.valueOf(mDaoWeightInfo.totalWeightValues(startDateTime[0].longValue()));
+            Double totalWeightNumber = mDaoWeightInfo.totalWeightValues(startDateTime[0].longValue(),startDateTime[1].longValue());
+            totalWeight = String.format("%.2f",totalWeightNumber);
         }
         catch (Exception e)
         {
             mException = e;
         }
-        //test code
-//        totalWeight = "10.4";
         return null;
     }
 

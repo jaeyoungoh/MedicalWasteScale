@@ -25,7 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 import java.util.Set;
 
@@ -83,26 +83,24 @@ public class MainActivity extends AppCompatActivity {
             Log.i("Medical Waste Scale Test", getData.toString());
             if(getData.isEmpty() || getData.size() <= 0)
                 return;
-            long selectDateTime = converTingToZeroTime(System.currentTimeMillis());
+            long selectDateTime = convertingToMidNightTime(System.currentTimeMillis());
+            long firstDayOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
             new AsyncSelectDB(localDB.DaoWeightInfo(), new AsyncSelectDB.AsyncTaskCallback(){
                 @Override
                 public void onSuccess(String result) {
                     mainActivityBinding.rightContents.totalWeightNumber.setText(result);
                 }
-
                 @Override
                 public void onFailure(Exception e) {
                     Toast.makeText(getApplicationContext(), "Error : DB 입력 오류", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
-            }).execute(Long.valueOf(selectDateTime));
+            }).execute(Long.valueOf(firstDayOfMonth),Long.valueOf(selectDateTime));
 
         });
-
         // csv 파일 저장
         mainActivityBinding.btnSaveSvc.setOnClickListener(v -> saveCsvFile());
-
     }
     private void sendingSerialTestData(View v){
         final String data = "             5.33 kg            ";
@@ -111,18 +109,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private long converTingToZeroTime(long dtm){
-
-        long convertedDate = 0;
-
+    private long convertingToMidNightTime(long dtm){
         if(dtm == 0) return 0;
-
-        Date mDtm = new Date(dtm);
-        LocalDate convertingDate = mDtm.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDateTime daytoMidnight = LocalDateTime.of(convertingDate, LocalTime.MIDNIGHT);
-        convertedDate = daytoMidnight.getLong(ChronoField.CLOCK_HOUR_OF_DAY);
-
-        return convertedDate;
+            long convertedDate = 0;
+            Date mDtm = new Date(dtm);
+            LocalDate convertingDate = mDtm.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDateTime daytoMidnight = LocalDateTime.of(convertingDate, LocalTime.MIDNIGHT);
+            convertedDate = daytoMidnight.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            return convertedDate;
     }
 
     private void saveCsvFile(){

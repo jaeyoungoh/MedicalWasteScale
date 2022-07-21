@@ -93,11 +93,10 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Exception e) {
-                    Toast.makeText(getApplicationContext(), "Error : DB", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Error : DB 입력 오류", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }).execute(Long.valueOf(selectDateTime));
-
 
         });
 

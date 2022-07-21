@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/rect_total_weight_content">
+    android:background="@drawable/rect_select_weight_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/select_weight_header"
         android:layout_width="match_parent"
         android:layout_height="110dp"
-        android:background="@drawable/rect_total_weight_header"
+        android:background="@drawable/rect_select_weight_header"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -28,20 +28,70 @@
             style="@style/Font_TotalWeightHeader"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="@string/total_weight_header" />
+            android:text="@string/select_weight_header" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/begin_date_label"
+        style="@style/Font_BeginDateLabel"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/begin_date_label"
+        app:layout_constraintBottom_toTopOf="@+id/end_date_label"
+        app:layout_constraintEnd_toStartOf="@+id/right_guideline"
+        app:layout_constraintHorizontal_weight="0.1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/select_weight_header"
+        tools:ignore="TextContrastCheck" />
+
+    <TextView
+        android:id="@+id/end_date_label"
+        style="@style/Font_EndDateLabel"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/end_date_label"
+        app:layout_constraintBottom_toTopOf="@id/total_label"
+        app:layout_constraintEnd_toStartOf="@+id/right_guideline"
+        app:layout_constraintHorizontal_weight="0.1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/begin_date_label"
+        tools:ignore="TextContrastCheck" />
+
+    <TextView
+        android:id="@+id/total_label"
+        style="@style/Font_TotalWeightLabel"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="40dp"
+        android:text="@string/total_weight_label"
+        android:paddingBottom="10dp"
+        android:gravity="center"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_weight="0.09"
+        app:layout_constraintTop_toBottomOf="@+id/end_date_label"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_guideline"
+        app:layout_constraintLeft_toRightOf="@+id/left_guideline"
+        app:layout_constraintRight_toLeftOf="@+id/total_weight_number"
+        tools:ignore="TextContrastCheck" />
 
     <TextView
         android:id="@+id/total_weight_number"
         style="@style/Font_TotalWeightNumber"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="32dp"
         android:text="@string/total_weight"
         android:gravity="center"
         app:layout_constraintHorizontal_weight="0.13"
-        app:layout_constraintTop_toBottomOf="@+id/select_weight_header"
+        app:layout_constraintTop_toBottomOf="@+id/end_date_label"
         app:layout_constraintBottom_toBottomOf="@+id/bottom_guideline"
-        app:layout_constraintLeft_toRightOf="@+id/left_guideline"
+        app:layout_constraintLeft_toRightOf="@+id/total_label"
         app:layout_constraintRight_toLeftOf="@+id/total_weight_unit"
         tools:ignore="TextContrastCheck" />
 
@@ -50,11 +100,11 @@
         style="@style/Font_TotalWeightUnit"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="40dp"
         android:text="@string/weight_unit"
         android:gravity="center"
         app:layout_constraintHorizontal_weight="0.04"
-        app:layout_constraintTop_toBottomOf="@+id/select_weight_header"
+        app:layout_constraintTop_toBottomOf="@+id/end_date_label"
         app:layout_constraintBottom_toBottomOf="@+id/bottom_guideline"
         app:layout_constraintLeft_toRightOf="@+id/total_weight_number"
         app:layout_constraintRight_toRightOf="@+id/right_guideline"
@@ -65,7 +115,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="1" />
+        app:layout_constraintGuide_percent="0.8" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/left_guideline"

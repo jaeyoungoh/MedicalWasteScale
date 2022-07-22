@@ -1,13 +1,15 @@
 package kr.co.rubeesys.medicalWasteScale;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
@@ -15,11 +17,12 @@ import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,10 +30,13 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import kr.co.rubeesys.medicalWasteScale.common.AppDatabase;
+import kr.co.rubeesys.medicalWasteScale.common.AsyncExportDB;
 import kr.co.rubeesys.medicalWasteScale.common.AsyncSelectDB;
+import kr.co.rubeesys.medicalWasteScale.common.WeightInfo;
 import kr.co.rubeesys.medicalWasteScale.databinding.MainBinding;
 import kr.co.rubeesys.medicalWasteScale.databinding.MainLeftContentsBinding;
 
@@ -75,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
         mUsbServiceHandler = new UsbServiceHandler(this);
         mainActivityBinding.imageLogo.setOnClickListener(v -> sendingSerialTestData(v));
 
+        //USB 접근 권한 설정
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MODE_PRIVATE);
+
         //DB 생성
         localDB = AppDatabase.getInstance(this.getApplicationContext());
 
@@ -83,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("Medical Waste Scale Test", getData.toString());
             if(getData.isEmpty() || getData.size() <= 0)
                 return;
-            long selectDateTime = convertingToMidNightTime(System.currentTimeMillis());
+            long selectDateTime = System.currentTimeMillis();
             long firstDayOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
             new AsyncSelectDB(localDB.DaoWeightInfo(), new AsyncSelectDB.AsyncTaskCallback(){
@@ -119,21 +128,84 @@ public class MainActivity extends AppCompatActivity {
             return convertedDate;
     }
 
+    private String convertingDateToString(long dtm){
+        Date getDateTime = new Date(dtm);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(getDateTime);
+    }
+
+    private static final int CREATE_FILE = 1;
+    private void startActionCreateDocumentForExportIntent(String createdFileName) {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/csv");
+        intent.putExtra(Intent.EXTRA_TITLE, createdFileName);
+        resultLauncher.launch(intent);
+    }
+
+    private StringBuilder sbWeightInfo;
+    ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent resultData  = result.getData();
+                    if (resultData  != null) {
+                        Uri uri = resultData.getData();
+
+                        try(OutputStream outputStream =
+                                    getContentResolver().openOutputStream(uri)) {
+                            if(outputStream != null){
+                                outputStream.write(sbWeightInfo.toString().getBytes());
+                            }
+
+                        } catch(Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+
+    private List<WeightInfo> mWeightInfoList;
     private void saveCsvFile(){
-        File appDir = new File(mainActivityBinding.getRoot().getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),   "Medical_Waste_Scale_data");
-        appDir.mkdirs();
-        try {
-            String storageState = Environment.getExternalStorageState();
-            if (storageState.equals(Environment.MEDIA_MOUNTED)) {
-                File file = new File(mainActivityBinding.getRoot().getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/Medical_Waste_Scale_data/" + nowDate() + "_OutputFile.csv");
-                FileOutputStream fos = new FileOutputStream(file);
-                String text = nowDateTime() + "," + "5.1";
-                fos.write(text.getBytes());
-                fos.close();
+        long selectDateTime = System.currentTimeMillis();
+        long firstDayOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        new AsyncExportDB(localDB.DaoWeightInfo(), new AsyncExportDB.AsyncTaskCallback() {
+            @Override
+            public void onSuccess(List<WeightInfo> weightInfoList) {
+                mWeightInfoList = weightInfoList;
+
+                try {
+                    sbWeightInfo = new StringBuilder();
+                    sbWeightInfo.append("No");
+                    sbWeightInfo.append(",");
+                    sbWeightInfo.append("Date Time");
+                    sbWeightInfo.append(",");
+                    sbWeightInfo.append("Weight Value");
+                    sbWeightInfo.append("\n");
+
+                    if(mWeightInfoList != null) {
+                        for(WeightInfo weightInfo : mWeightInfoList)
+                        {
+                            sbWeightInfo.append(weightInfo.getUid());
+                            sbWeightInfo.append(",");
+                            sbWeightInfo.append(convertingDateToString(weightInfo.getCreateDateTime()));
+                            sbWeightInfo.append(",");
+                            sbWeightInfo.append(weightInfo.getWeightValue());
+                            sbWeightInfo.append("\n");
+                        }
+                    }
+                    startActionCreateDocumentForExportIntent(nowDate() + "_OutputFile.csv");
+                }   catch (Exception e) {
+                    Log.e("IOException", "exception in saveCsvFile() method");
+                }
             }
-        }   catch (IOException e) {
-            Log.e("IOException", "exception in saveCsvFile() method");
-        }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Error : Data를 저장하는 도중 에러가 발생하였습니다.", Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+        }).execute(Long.valueOf(firstDayOfMonth),Long.valueOf(selectDateTime));
     }
 
     private String nowDate(){

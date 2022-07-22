@@ -34,7 +34,6 @@ public class UsbServiceHandler extends Handler{
                     weightInfo.setCreateDateTime(System.currentTimeMillis());
 
                     new AsyncInsertDB(MainActivity.localDB.DaoWeightInfo()).execute(weightInfo);
-                    //Log.d("Inter to DB",MainActivity.localDB.DaoWeightInfo().getAll().toString());
 
                     //시리얼 데이터 초기화
                     this.removeMessages(UsbService.INIT_VALUE);

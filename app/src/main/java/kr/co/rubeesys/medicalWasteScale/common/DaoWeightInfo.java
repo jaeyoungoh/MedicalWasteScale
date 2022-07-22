@@ -11,14 +11,17 @@ import java.util.List;
 @Dao
 public interface DaoWeightInfo {
 
-    @Query("SELECT * FROM weightInfo")
+    @Query("SELECT * FROM WeightInfo")
     LiveData<List<WeightInfo>> getAll();
 
-    @Query("SELECT printf('%.2f', COALESCE(SUM(COALESCE(weightValue,0.00)),0.00)) as totalWeight FROM weightInfo where createDateTime >= (:startDateTime)")
+    @Query("SELECT printf('%.2f', COALESCE(SUM(COALESCE(weightValue,0.00)),0.00)) as totalWeight FROM WeightInfo where createDateTime >= (:startDateTime)")
     Double totalWeightValues(long startDateTime);
 
-    @Query("SELECT printf('%.2f', COALESCE(SUM(COALESCE(weightValue,0.00)),0.00)) as totalWeight FROM weightInfo where createDateTime between (:startDateTime) and (:endDateTime)")
+    @Query("SELECT printf('%.2f', COALESCE(SUM(COALESCE(weightValue,0.00)),0.00)) as totalWeight FROM WeightInfo where createDateTime between (:startDateTime) and (:endDateTime)")
     Double totalWeightValues(long startDateTime, long endDateTime);
+
+    @Query("SELECT * FROM WeightInfo where createDateTime between (:startDateTime) and (:endDateTime)")
+    List<WeightInfo> totalWeight(long startDateTime, long endDateTime);
 
     @Insert
     void addWeightValue(WeightInfo weightInfo);
@@ -26,7 +29,7 @@ public interface DaoWeightInfo {
     @Update
     void editWeightValue(WeightInfo weightInfo);
 
-    @Query("DELETE FROM weightInfo where createDateTime between (:startDateTime) and (:endDateTime)")
+    @Query("DELETE FROM WeightInfo where createDateTime between (:startDateTime) and (:endDateTime)")
     void deleteWeightValues(long startDateTime, long endDateTime);
 
 }

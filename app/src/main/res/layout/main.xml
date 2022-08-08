@@ -73,7 +73,7 @@
     <include
         android:id="@+id/right_contents_select"
         layout="@layout/main_right_contents_select"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_width="0dp"
         android:layout_height="425dp"
         android:layout_marginStart="25dp"
@@ -91,6 +91,16 @@
         app:layout_constraintBottom_toBottomOf="@id/right_contents"
         app:layout_constraintRight_toRightOf="@id/right_contents"
         tools:ignore="SpeakableTextPresentCheck" />
+
+    <ImageButton
+        android:id="@+id/btn_Setting"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/btn_setting_pressed"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/center_guideline"

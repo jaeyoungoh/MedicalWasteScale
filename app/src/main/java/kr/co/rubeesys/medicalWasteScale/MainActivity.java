@@ -1,5 +1,7 @@
 package kr.co.rubeesys.medicalWasteScale;
 
+import static kr.co.rubeesys.medicalWasteScale.common.InitString.EMPTY_STRING;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -14,6 +16,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -40,18 +43,20 @@ import java.util.Set;
 import kr.co.rubeesys.medicalWasteScale.common.AppDatabase;
 import kr.co.rubeesys.medicalWasteScale.common.AsyncExportDB;
 import kr.co.rubeesys.medicalWasteScale.common.AsyncSelectDB;
+import kr.co.rubeesys.medicalWasteScale.common.DatePickerFragment;
 import kr.co.rubeesys.medicalWasteScale.common.WeightInfo;
 import kr.co.rubeesys.medicalWasteScale.databinding.MainBinding;
-import kr.co.rubeesys.medicalWasteScale.databinding.MainLeftContentsBinding;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DatePickerFragment.OnDateAdjustedListener  {
+
+    //Date picker 태그
+    public static String datePickerTag = EMPTY_STRING;
 
     //Local DB
     public static AppDatabase localDB;
 
     // main binding
-    public MainBinding mainActivityBinding;
-    private MainLeftContentsBinding leftContentsBinding;
+    public static MainBinding mainActivityBinding;
 
     // USB Service
     private UsbService usbService;
@@ -82,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
         decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         //화면을 켜진 상태로 유지
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        //조회-시작일,종료일 editText 키보드 숨김
+        mainActivityBinding.rightContentsSelect.startedEditText.setInputType(InputType.TYPE_NULL);
+        mainActivityBinding.rightContentsSelect.endedEditText.setInputType(InputType.TYPE_NULL);
 
         mUsbServiceHandler = new UsbServiceHandler(this);
         mainActivityBinding.imageLogo.setOnClickListener(v -> sendingSerialTestData(v));
@@ -127,7 +135,53 @@ public class MainActivity extends AppCompatActivity {
         });
         // csv 파일 저장
         mainActivityBinding.btnSaveSvc.setOnClickListener(v -> saveCsvFile());
+        // Data picker dialog
+        mainActivityBinding.rightContentsSelect.startedEditText.setOnClickListener(v -> callDatePickerDialog(v));
+        mainActivityBinding.rightContentsSelect.endedEditText.setOnClickListener(v -> callDatePickerDialog(v));
+
+    }// onCreate Ends
+    private void callDatePickerDialog(View v){
+            String onFocusedViewName = v.getResources().getResourceEntryName(v.getId());
+            switch (onFocusedViewName)
+            {
+                case "startedEditText":
+                {
+                    datePickerTag = "StartedDatePick";
+                    break;
+                }
+                case "endedEditText":
+                {
+                    datePickerTag = "EndedDatePick";
+                    break;
+                }
+                default:
+                    return;
+            }
+            DatePickerFragment mDialogFragmentDatePickerFragment = new DatePickerFragment(this);
+            mDialogFragmentDatePickerFragment.show(getSupportFragmentManager(), datePickerTag);
     }
+
+    @Override
+    public void onDateAdjusted(String tag, String selectedDate) {
+
+        switch(tag){
+            case "StartedDatePick":
+            {
+                mainActivityBinding.rightContentsSelect.startedEditText.setText(selectedDate);
+                break;
+            }
+            case "EndedDatePick":
+            {
+                mainActivityBinding.rightContentsSelect.endedEditText.setText(selectedDate);
+                break;
+            }
+            default:
+                return;
+        }
+
+
+    }
+
     private void sendingSerialTestData(View v){
         final String data = "             5.33 kg            ";
         if(usbService != null)
@@ -304,5 +358,4 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED);
         registerReceiver(mUsbReceiver, filter);
     }
-
 }

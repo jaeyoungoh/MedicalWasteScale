@@ -83,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
         mainActivityBinding = MainBinding.inflate(getLayoutInflater());
         setContentView(mainActivityBinding.getRoot());
 
+        initDate();
+
         //네비게이션 바(소프트키) 숨김
         final View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
@@ -150,7 +152,30 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
             }
         });
 
+        mainActivityBinding.rightContents.selectWeightHeader.setOnClickListener(v -> {
+            mainActivityBinding.rightContents.getRoot().setVisibility(View.GONE);
+            mainActivityBinding.rightContentsSelect.getRoot().setVisibility(View.VISIBLE);
+        });
+
+        mainActivityBinding.rightContentsSelect.selectWeightHeader.setOnClickListener(v -> {
+            mainActivityBinding.rightContents.getRoot().setVisibility(View.VISIBLE);
+            mainActivityBinding.rightContentsSelect.getRoot().setVisibility(View.GONE);
+        });
+
     }// onCreate Ends
+
+    private void initDate(){
+        long selectStartedDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(); // 매월 1일
+        long selectEndedDate = System.currentTimeMillis(); // 현재 날짜
+        Date startedDate = new Date(selectStartedDate);
+        Date endedDate = new Date(selectEndedDate);
+        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+
+        mainActivityBinding.rightContentsSelect.startedEditText.setText(f.format(startedDate));
+        mainActivityBinding.rightContentsSelect.endedEditText.setText(f.format(endedDate));
+
+    }
+
     private void watchingEditText(){
         //시작일, 종료일 날짜 가져와서 long으로 변경
         String sStartedDate = mainActivityBinding.rightContentsSelect.startedEditText.getText().toString();
@@ -377,6 +402,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
         super.onResume();
         setFilters();  // Start listening notifications from UsbService
         startService(UsbService.class, usbConnection, null); // Start UsbService(if it was not started before) and Bind it
+        initDate();
     }
 
     @Override

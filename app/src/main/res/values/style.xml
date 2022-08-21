@@ -169,4 +169,9 @@
         <item name="android:letterSpacing">0.1</item>
     </style>
 
+    <style name="Custom_datePicker_dialog">
+        <item name="android:textSize">25sp</item>
+        <item name="fontFamily">@font/h2hdrm</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
 </resources>

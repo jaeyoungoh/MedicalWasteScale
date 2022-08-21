@@ -1,5 +1,7 @@
 package kr.co.rubeesys.medicalWasteScale;
 
+import static kr.co.rubeesys.medicalWasteScale.common.InitString.EMPTY_STRING;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -14,6 +16,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -27,10 +32,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
@@ -40,18 +44,20 @@ import java.util.Set;
 import kr.co.rubeesys.medicalWasteScale.common.AppDatabase;
 import kr.co.rubeesys.medicalWasteScale.common.AsyncExportDB;
 import kr.co.rubeesys.medicalWasteScale.common.AsyncSelectDB;
+import kr.co.rubeesys.medicalWasteScale.common.DatePickerFragment;
 import kr.co.rubeesys.medicalWasteScale.common.WeightInfo;
 import kr.co.rubeesys.medicalWasteScale.databinding.MainBinding;
-import kr.co.rubeesys.medicalWasteScale.databinding.MainLeftContentsBinding;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DatePickerFragment.OnDateAdjustedListener {
+
+    //Date picker 태그
+    public static String datePickerTag = EMPTY_STRING;
 
     //Local DB
     public static AppDatabase localDB;
 
     // main binding
-    public MainBinding mainActivityBinding;
-    private MainLeftContentsBinding leftContentsBinding;
+    public static MainBinding mainActivityBinding;
 
     // USB Service
     private UsbService usbService;
@@ -82,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
         decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         //화면을 켜진 상태로 유지
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        //조회-시작일,종료일 editText 키보드 숨김
+        mainActivityBinding.rightContentsSelect.startedEditText.setInputType(InputType.TYPE_NULL);
+        mainActivityBinding.rightContentsSelect.endedEditText.setInputType(InputType.TYPE_NULL);
 
         mUsbServiceHandler = new UsbServiceHandler(this);
         mainActivityBinding.imageLogo.setOnClickListener(v -> sendingSerialTestData(v));
@@ -106,52 +115,176 @@ public class MainActivity extends AppCompatActivity {
 
         //DB 변경 발생시
         localDB.DaoWeightInfo().getAll().observe(this, getData -> {
-            Log.i("Medical Waste Scale Test", getData.toString());
-            if(getData.isEmpty() || getData.size() <= 0)
+//            Log.i("Medical Waste Scale Test", getData.toString());
+            if (getData.isEmpty() || getData.size() <= 0)
                 return;
-            long selectDateTime = System.currentTimeMillis();
-            long firstDayOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            // Edit Text를 확인후 조회.
+            watchingEditText();
+        });
+        // csv 파일 저장
+        mainActivityBinding.btnSaveSvc.setOnClickListener(v -> saveCsvFile());
 
-            new AsyncSelectDB(localDB.DaoWeightInfo(), new AsyncSelectDB.AsyncTaskCallback(){
+        // Datepicker dialog
+        mainActivityBinding.rightContentsSelect.startedEditText.setOnClickListener(v -> callDatePickerDialog(v));
+        mainActivityBinding.rightContentsSelect.endedEditText.setOnClickListener(v -> callDatePickerDialog(v));
+
+        // editText SetChange
+        mainActivityBinding.rightContentsSelect.startedEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                watchingEditText();
+            }
+        });
+        mainActivityBinding.rightContentsSelect.endedEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                watchingEditText();
+            }
+        });
+
+    }// onCreate Ends
+    private void watchingEditText(){
+        //시작일, 종료일 날짜 가져와서 long으로 변경
+        String sStartedDate = mainActivityBinding.rightContentsSelect.startedEditText.getText().toString();
+        String sEndedDate = mainActivityBinding.rightContentsSelect.endedEditText.getText().toString();
+        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+
+        long startedDate = 0;
+        long endedDate = 0;
+
+        try{
+            Date s = f.parse(sStartedDate);
+            Date e = f.parse(sEndedDate);
+
+            e.setDate(e.getDate() + 1);
+            startedDate = s.getTime();
+            endedDate = e.getTime();
+
+            //종료일이 시작일보다 빠를 경우 에러 발생
+            if(startedDate > endedDate){
+                endedDate = System.currentTimeMillis();
+                Toast.makeText(getApplicationContext(), "Error : 종료일은 시작일보다 빠른 수 없습니다.", Toast.LENGTH_LONG).show();
+            }
+
+        }catch (ParseException e)
+        {
+            Toast.makeText(getApplicationContext(), "날짜 데이터 형식 오류 발생", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+
+        //비동기 DB 조회
+        selecteDB(startedDate, endedDate);
+    }
+
+    private void selecteDB(long startedDate , long endedDate){
+
+        long selectStartedDate = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(); // 매월 1일
+        long selectEndedDate = System.currentTimeMillis(); // 현재 날짜
+        if(startedDate != 0 && endedDate != 0)
+        {
+            selectStartedDate = startedDate;
+            selectEndedDate = endedDate;
+        }
+        try {
+            new AsyncSelectDB(localDB.DaoWeightInfo(), new AsyncSelectDB.AsyncTaskCallback() {
                 @Override
                 public void onSuccess(String result) {
                     mainActivityBinding.rightContents.totalWeightNumber.setText(result);
+                    mainActivityBinding.rightContentsSelect.totalWeightNumber.setText(result);
                 }
+
                 @Override
                 public void onFailure(Exception e) {
                     Toast.makeText(getApplicationContext(), "Error : DB 입력 오류", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
-            }).execute(Long.valueOf(firstDayOfMonth),Long.valueOf(selectDateTime));
-
-        });
-        // csv 파일 저장
-        mainActivityBinding.btnSaveSvc.setOnClickListener(v -> saveCsvFile());
+            }).execute(Long.valueOf(selectStartedDate), Long.valueOf(selectEndedDate));
+        }
+        catch (Exception e)
+        {
+            Toast.makeText(this,"Error : DB 조회 중 에러가 발생하였습니다. 관리자에게 문의해주세요", Toast.LENGTH_LONG).show();
+        }
     }
-    private void sendingSerialTestData(View v){
+
+    boolean bOnClicked = false;
+    private void callDatePickerDialog(View v) {
+        String onFocusedViewName = v.getResources().getResourceEntryName(v.getId());
+
+        if(bOnClicked) {
+            return;
+        }
+        bOnClicked = true;
+
+        switch (onFocusedViewName) {
+            case "startedEditText": {
+                datePickerTag = "StartedDatePick";
+                break;
+            }
+            case "endedEditText": {
+                datePickerTag = "EndedDatePick";
+                break;
+            }
+            default:
+                return;
+        }
+        DatePickerFragment mDialogFragmentDatePickerFragment = new DatePickerFragment(this);
+
+        mDialogFragmentDatePickerFragment.show(getSupportFragmentManager(), datePickerTag);
+        bOnClicked = false;
+    }
+
+    @Override
+    public void onDateAdjusted(String tag, String selectedDate) {
+
+        switch (tag) {
+            case "StartedDatePick": {
+                mainActivityBinding.rightContentsSelect.startedEditText.setText(selectedDate);
+                break;
+            }
+            case "EndedDatePick": {
+                mainActivityBinding.rightContentsSelect.endedEditText.setText(selectedDate);
+                break;
+            }
+            default:
+                return;
+        }
+
+
+    }
+
+    private void sendingSerialTestData(View v) {
         final String data = "             5.33 kg            ";
-        if(usbService != null)
+        if (usbService != null)
             usbService.write(data.getBytes());
 
     }
 
-    private long convertingToMidNightTime(long dtm){
-        if(dtm == 0) return 0;
-            long convertedDate = 0;
-            Date mDtm = new Date(dtm);
-            LocalDate convertingDate = mDtm.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDateTime daytoMidnight = LocalDateTime.of(convertingDate, LocalTime.MIDNIGHT);
-            convertedDate = daytoMidnight.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-            return convertedDate;
-    }
-
-    private String convertingDateToString(long dtm){
+//    private long convertingToMidNightTime(long dtm) {
+//        if (dtm == 0) return 0;
+//        long convertedDate = 0;
+//        Date mDtm = new Date(dtm);
+//        LocalDate convertingDate = mDtm.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//        LocalDateTime daytoMidnight = LocalDateTime.of(convertingDate, LocalTime.MIDNIGHT);
+//        convertedDate = daytoMidnight.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+//        return convertedDate;
+//    }
+//
+    private String convertingDateToString(long dtm) {
         Date getDateTime = new Date(dtm);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(getDateTime);
     }
 
     private static final int CREATE_FILE = 1;
+
     private void startActionCreateDocumentForExportIntent(String createdFileName) {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -165,17 +298,17 @@ public class MainActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent resultData  = result.getData();
-                    if (resultData  != null) {
+                    Intent resultData = result.getData();
+                    if (resultData != null) {
                         Uri uri = resultData.getData();
 
-                        try(OutputStream outputStream =
-                                    getContentResolver().openOutputStream(uri)) {
-                            if(outputStream != null){
+                        try (OutputStream outputStream =
+                                     getContentResolver().openOutputStream(uri)) {
+                            if (outputStream != null) {
                                 outputStream.write(sbWeightInfo.toString().getBytes());
                             }
 
-                        } catch(Exception e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -183,7 +316,8 @@ public class MainActivity extends AppCompatActivity {
             });
 
     private List<WeightInfo> mWeightInfoList;
-    private void saveCsvFile(){
+
+    private void saveCsvFile() {
         long selectDateTime = System.currentTimeMillis();
         long firstDayOfMonth = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
         new AsyncExportDB(localDB.DaoWeightInfo(), new AsyncExportDB.AsyncTaskCallback() {
@@ -200,9 +334,8 @@ public class MainActivity extends AppCompatActivity {
                     sbWeightInfo.append("Weight Value");
                     sbWeightInfo.append("\n");
 
-                    if(mWeightInfoList != null) {
-                        for(WeightInfo weightInfo : mWeightInfoList)
-                        {
+                    if (mWeightInfoList != null) {
+                        for (WeightInfo weightInfo : mWeightInfoList) {
                             sbWeightInfo.append(weightInfo.getUid());
                             sbWeightInfo.append(",");
                             sbWeightInfo.append(convertingDateToString(weightInfo.getCreateDateTime()));
@@ -212,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     startActionCreateDocumentForExportIntent(nowDate() + "_OutputFile.csv");
-                }   catch (Exception e) {
+                } catch (Exception e) {
                     Log.e("IOException", "exception in saveCsvFile() method");
                 }
             }
@@ -222,17 +355,17 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Error : Data를 저장하는 도중 에러가 발생하였습니다.", Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
-        }).execute(Long.valueOf(firstDayOfMonth),Long.valueOf(selectDateTime));
+        }).execute(Long.valueOf(firstDayOfMonth), Long.valueOf(selectDateTime));
     }
 
-    private String nowDate(){
+    private String nowDate() {
         long now = System.currentTimeMillis();
         Date date = new Date(now);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(date);
     }
 
-    private String nowDateTime(){
+    private String nowDateTime() {
         long now = System.currentTimeMillis();
         Date date = new Date(now);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -304,5 +437,4 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED);
         registerReceiver(mUsbReceiver, filter);
     }
-
 }

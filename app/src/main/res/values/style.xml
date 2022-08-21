@@ -78,7 +78,7 @@
 
     <style name="Font_BeginDateLabel">
         <item name="android:fontFamily">@font/h2hdrm</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">#E09743</item>
         <item name="android:autoSizeTextType">uniform</item>
         <item name="android:textStyle">bold</item>
         <item name="android:autoSizeMaxTextSize">30sp</item>
@@ -90,7 +90,7 @@
 
     <style name="Font_EndDateLabel">
         <item name="android:fontFamily">@font/h2hdrm</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">#E09743</item>
         <item name="android:autoSizeTextType">uniform</item>
         <item name="android:textStyle">bold</item>
         <item name="android:autoSizeMaxTextSize">30sp</item>
@@ -103,7 +103,7 @@
     <style name="Font_TotalWeightLabel">
         <item name="android:includeFontPadding">false</item>
         <item name="android:fontFamily">@font/h2hdrm</item>
-        <item name="android:textColor">#002060</item>
+        <item name="android:textColor">#A87943</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">45sp</item>
         <item name="android:autoSizeTextType">uniform</item>
@@ -116,7 +116,7 @@
     <style name="Font_TotalWeightNumber">
         <item name="android:includeFontPadding">false</item>
         <item name="android:fontFamily">@font/h2hdrm</item>
-        <item name="android:textColor">#002060</item>
+        <item name="android:textColor">#A87943</item>
         <item name="android:textStyle">bold</item>
         <item name="android:autoSizeTextType">uniform</item>
         <item name="android:textSize">50sp</item>
@@ -130,6 +130,34 @@
     <style name="Font_TotalWeightUnit">
         <item name="android:includeFontPadding">false</item>
         <item name="android:fontFamily">@font/h2hdrm</item>
+        <item name="android:textColor">#A87943</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:autoSizeMaxTextSize">60sp</item>
+        <item name="android:autoSizeStepGranularity">10sp</item>
+        <item name="android:autoSizeMinTextSize">30sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:letterSpacing">0.1</item>
+    </style>
+
+    <style name="Font_SelectedTotalWeightNumber">
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:fontFamily">@font/h2hdrm</item>
+        <item name="android:textColor">#002060</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:textSize">50sp</item>
+        <item name="android:autoSizeMaxTextSize">120sp</item>
+        <item name="android:autoSizeStepGranularity">5sp</item>
+        <item name="android:autoSizeMinTextSize">40sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:letterSpacing">0.1</item>
+    </style>
+
+    <style name="Font_SelectedTotalWeightUnit">
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:fontFamily">@font/h2hdrm</item>
         <item name="android:textColor">#002060</item>
         <item name="android:autoSizeTextType">uniform</item>
         <item name="android:textStyle">bold</item>
@@ -141,4 +169,9 @@
         <item name="android:letterSpacing">0.1</item>
     </style>
 
+    <style name="Custom_datePicker_dialog">
+        <item name="android:textSize">25sp</item>
+        <item name="fontFamily">@font/h2hdrm</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
 </resources>
